@@ -1,0 +1,49 @@
+name: Publish blog to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Build Jekyll
+        env:
+          JEKYLL_ENV: production
+          PAGES_URL: ${{ steps.pages.outputs.origin }}
+          PAGES_BASEURL: ${{ steps.pages.outputs.base_path }}
+        run: |
+          ruby -ryaml -e 'File.write("/tmp/pages.yml", {"url" => ENV.fetch("PAGES_URL")}.to_yaml)'
+          bundle exec jekyll build --config _config.yml,/tmp/pages.yml --baseurl "$PAGES_BASEURL"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
