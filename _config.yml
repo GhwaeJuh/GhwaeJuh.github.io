@@ -1,0 +1,25 @@
+title: GhwaeJuh 的博客
+description: 学习笔记、技术记录与随笔。
+lang: zh-CN
+timezone: Asia/Shanghai
+url: ""
+baseurl: ""
+theme: minima
+minima:
+  date_format: "%Y-%m-%d"
+header_pages:
+  - archive.html
+  - about.md
+show_excerpts: true
+permalink: /posts/:title/
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
+  - preview
+  - scripts
